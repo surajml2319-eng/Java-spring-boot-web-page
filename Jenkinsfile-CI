@@ -97,7 +97,7 @@ pipeline {
             // Login to Dockerhub & Push the image to Dockerhub
             steps{
                 script { 
-                  withCredentials([usernamePassword(credentialsId: 'dockerHub', usernameVariable: 'docker_user', passwordVariable: 'docker_pass')]) {
+                  withCredentials([usernamePassword(credentialsId: 'dockerHub', usernameVariable: 'dockerHubUser', passwordVariable: 'dockerHubPass')]) {
                     def JOB = env.JOB_NAME.toLowerCase() // Convert Jenkins Job name to lower-case
                     
                     // Use ''' (triple single quotes) to completely block Groovy interpolation
