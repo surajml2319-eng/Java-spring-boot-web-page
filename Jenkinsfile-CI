@@ -98,12 +98,14 @@ pipeline {
             steps{
                 script { 
                   withCredentials([usernamePassword(credentialsId: 'dockerHub', usernameVariable: 'docker_user', passwordVariable: 'docker_pass')]) {
-                    // Fixed: Use --password-stdin via echo and run on its own separate line
-                    sh "echo '${docker_pass}' | docker login -u '${docker_user}' --password-stdin"
-                    
                     def JOB = env.JOB_NAME.toLowerCase() // Convert Jenkins Job name to lower-case
-                    sh "docker push ${DOCKER_USERNAME}/${JOB}:v${BUILD_NUMBER}"
-                    sh "docker push ${DOCKER_USERNAME}/${JOB}:latest"
+                    
+                    // Use ''' (triple single quotes) to completely block Groovy interpolation
+                    sh '''
+                        echo '${docker_pass}' | docker login -u '${docker_user}' --password-stdin
+                        docker push ${DOCKER_USERNAME}/${JOB}:v${BUILD_NUMBER}
+                        docker push ${DOCKER_USERNAME}/${JOB}:latest
+                    '''
                   }
                 }
             }
