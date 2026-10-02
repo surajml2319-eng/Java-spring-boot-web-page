@@ -29,7 +29,7 @@ pipeline {
                   }
                 }
             }
-        }   
+        }    
         
         stage("3. Maven Unit Test") {  
             // Test the individual units of code 
@@ -44,7 +44,7 @@ pipeline {
             // Build the application into an executable file (.jar)
             steps{
                 dir ("Java-spring-boot-web-page"){
-                  sh 'mvn clean install'   
+                  sh 'mvn clean install'    
                 }
             }
         }
@@ -53,7 +53,7 @@ pipeline {
             //  Test the interaction between different units of code
             steps{
                 dir ("Java-spring-boot-web-page"){
-                  sh 'mvn verify'          
+                  sh 'mvn verify'         
                 }
             }
         }
@@ -63,7 +63,7 @@ pipeline {
             steps{
                 dir('Java-spring-boot-web-page') {      // go to directory where 'Dockerfile' is stored
                     script {
-                      def JOB = env.JOB_NAME.toLowerCase()           // Convert Jenkins Job name to lower-case
+                      def JOB = env.JOB_NAME.toLowerCase()            // Convert Jenkins Job name to lower-case
                       sh "docker build -t ${JOB}:${BUILD_NUMBER} ."  // 'JOB_NAME' & 'BUILD_NUMBER' are Jenkins Global variable
                     }
                 }
@@ -98,7 +98,9 @@ pipeline {
             steps{
                 script { 
                   withCredentials([usernamePassword(credentialsId: 'dockerHub', usernameVariable: 'docker_user', passwordVariable: 'docker_pass')]) {
-                    sh "docker login -u '${docker_user}' -p '${docker_pass}'"
+                    // Fixed: Use --password-stdin via echo and run on its own separate line
+                    sh "echo '${docker_pass}' | docker login -u '${docker_user}' --password-stdin"
+                    
                     def JOB = env.JOB_NAME.toLowerCase() // Convert Jenkins Job name to lower-case
                     sh "docker push ${DOCKER_USERNAME}/${JOB}:v${BUILD_NUMBER}"
                     sh "docker push ${DOCKER_USERNAME}/${JOB}:latest"
